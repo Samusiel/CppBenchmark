@@ -23,19 +23,44 @@ public:
     template <IsConfigAllowedType<Ts...> T>
     using PerTypeConfigContainer = std::vector<ConfigVariableValue<T>>;
 
+private:
+    using ConfigVariableId = size_t;
+    template <IsConfigAllowedType<Ts...> T>
+    class Accessor {
+    public:
+        using ValueType = T;
+
+    public:
+        Accessor(ConfigRegistryBase& registry, ConfigVariableId id): _registry(registry),  _id(id) {}
+        auto getValue() const -> T { 
+            const auto& container = std::get<PerTypeConfigContainer<T>>(_registry._configVariables);
+            return container[_id];
+        }
+
+        auto setValue(T value) -> void { 
+            auto& container = std::get<PerTypeConfigContainer<T>>(_registry._configVariables);
+            container[_id] = value;
+        }
+
+    private:
+        ConfigRegistryBase& _registry;
+        ConfigVariableId _id;
+    };
+
 public:
     template <IsConfigAllowedType<Ts...> T>
     [[nodiscard]]
     auto registerConfigVariable(std::string_view name, T defaultValue = {}) -> ConfigVariable<T> {
         auto& container = std::get<PerTypeConfigContainer<T>>(_configVariables);
         //container.emplace_back(std::move(defaultValue));
-        return 0;
+        auto accessor = Accessor<T>{*this, 0};
+        return ConfigVariable<T>{accessor};
     }
 
     template <IsConfigAllowedType<Ts...> T>
     [[nodiscard]]
-    auto getConfigVariableValueByName(std::string_view name) -> T {
-        auto& container = std::get<PerTypeConfigContainer<T>>(_configVariables);
+    auto getConfigVariableValueByName(std::string_view name) const -> T {
+        const auto& container = std::get<PerTypeConfigContainer<T>>(_configVariables);
         //container.emplace_back(std::move(defaultValue));
         return 0;
     }

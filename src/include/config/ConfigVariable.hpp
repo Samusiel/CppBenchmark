@@ -8,8 +8,8 @@ concept AtomicType = std::atomic<T>::is_always_lock_free;
 
 template <class T>
 concept IsAccessor = requires(T item) {
-    { item.get() } -> std::same_as<typename T::ValueType>;
-    { item.set(typename T::ValueType{}) } -> std::same_as<void>;
+    { item.getValue() } -> std::same_as<typename T::ValueType>;
+    { item.setValue(typename T::ValueType{}) } -> std::same_as<void>;
 };
 
 using ConfigVariableId = size_t;
@@ -18,11 +18,12 @@ template <AtomicType T>
 class ConfigVariable {
 private:
     template <AtomicType ... Ts>
-    class ConfigRegistryBase;
-    using AccessorGet = T();
-    using AccessorSet = void(const T&);
+    friend class ConfigRegistryBase;
+    using AccessorGet = T(void* accessorPtr);
+    using AccessorSet = void(void* accessorPtr, const T&);
     
 public:
+
     auto getValue() const -> const T& {
         return _getter(_accessor);
     }
@@ -33,19 +34,19 @@ public:
 
 private:
     template <IsAccessor Accessor>
-    ConfigVariable(const Accessor& accessor): 
+    ConfigVariable(Accessor& accessor): 
         _accessor{&accessor},
-        _getter([](const void* accessorPtr) {
-            const auto& accessor = *static_cast<const Accessor*>(accessorPtr);
-            return accessor.get();
+        _getter([](void* accessorPtr) {
+            const auto& accessor = *static_cast<Accessor*>(accessorPtr);
+            return accessor.getValue();
         }),
-        _setter([](const void* accessorPtr, T value) {
-            const auto& accessor = *static_cast<const Accessor*>(accessorPtr);
-            accessor.set(value);
+        _setter([](void* accessorPtr, const T& value) {
+            auto& accessor = *static_cast<Accessor*>(accessorPtr);
+            accessor.setValue(value);
         }) {}
 
 private:
-    const void* _accessor = nullptr;
+    void* _accessor = nullptr;
     AccessorGet* _getter = nullptr;
     AccessorSet* _setter = nullptr;
 };
