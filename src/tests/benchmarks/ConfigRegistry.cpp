@@ -8,17 +8,20 @@ namespace {
     }
 
     void configVariableAccess() {
-        static auto registry = createRegistry();
-        auto temp = registry.registerConfigVariable<int>("Hello World", 42);
+        
         
     }
 }
 
 static void BM_SomeFunction(benchmark::State& state) {
+  static auto registry = createRegistry();
   // Perform setup here
   for (auto _ : state) {
     // This code gets timed
-    configVariableAccess();
+    for (int i = 0; i < 1024; ++i) {
+      [[maybe_unused]]
+      int value = registry.exampleVariable.getValue();
+    }
   }
 }
 // Register the function as a benchmark
