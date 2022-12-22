@@ -6,6 +6,7 @@
 #include <concepts>
 #include <atomic>
 #include <string_view>
+#include <unordered_map>
 
 namespace ConfigLibrary {
 
@@ -27,6 +28,7 @@ protected:
     public:
         ConfigVariable(ConfigRegistryBase& registry_, ConfigVariableId id_): registry{registry_}, id{id_} {}
         ConfigVariable(const ConfigVariable&) = delete;
+        ConfigVariable(ConfigVariable&&) = delete;
 
         auto getValue() const -> T { 
             const auto& container = std::get<PerTypeConfigContainer<T>>(registry._configVariables);
@@ -53,14 +55,19 @@ private:
 
     template <IsConfigAllowedType<Ts...> T>
     using PerTypeConfigContainer = std::vector<ConfigVariableValueContainer<T>>;
+    using AddressTable = std::unordered_map<std::string_view, ConfigVariableId>;
 
 public:
     template <IsConfigAllowedType<Ts...> T>
     [[nodiscard]]
     auto getConfigVariableValueByName(std::string_view name) const -> T {
         const auto& container = std::get<PerTypeConfigContainer<T>>(_configVariables);
-        //container.emplace_back(std::move(defaultValue));
-        return 0;
+        if (auto it = _addressTable.find(name); it != _addressTable.end()) {
+            return container[it->second].value.load();
+        }
+        // No values related to the name
+        assert(false);
+        return T{};
     }
 
 protected:
@@ -70,12 +77,17 @@ protected:
     [[nodiscard]]
     auto registerConfigVariable(std::string_view name, T defaultValue = {}) -> ConfigVariable<T> {
         auto& container = std::get<PerTypeConfigContainer<T>>(_configVariables);
+        // We check that the name is not presented
+        assert(_addressTable.find(name) == _addressTable.end());
         container.emplace_back(container.size());
-        return ConfigVariable<T>{*this, container.size() - 1};
+        size_t idx = container.size() - 1;
+        _addressTable.insert({name, idx});
+        return ConfigVariable<T>{*this, idx};
     }
 
 private:
     std::tuple<PerTypeConfigContainer<Ts>...> _configVariables;
+    AddressTable _addressTable;
 };
 
 class ConfigRegistry : public ConfigRegistryBase<int, float, double> {
