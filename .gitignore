@@ -1,0 +1,6 @@
+# The general rules for ignoring files and folders
+
+# VSCode related files and folders
+.vscode/
+build/
+.DS_Store
