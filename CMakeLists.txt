@@ -14,3 +14,5 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests/)
 
 # add the executable
 add_executable(CppBenchmark ${SRC_FILES})
+
+target_link_libraries(CppBenchmark CppBenchmarkLib)
