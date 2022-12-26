@@ -1,4 +1,3 @@
-#include <config/ConfigRegistry.hpp>
 #include <iostream>
 #include <math/Hash.hpp>
 
