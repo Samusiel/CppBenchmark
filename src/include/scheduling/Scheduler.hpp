@@ -1,39 +1,27 @@
 #pragma once
 
 #include <concepts>
-#include <atomic>
-#include <functional>
-#include <semaphore>
 #include <queue>
-#include <cstdint>
 #include <mutex>
-#include <thread>
-#include <vector>
+#include <optional>
+#include <scheduling/Definitionts.hpp>
+#include <scheduling/WorkerBase.hpp>
 
 namespace Scheduling {
 
-using TaskFunction = std::function<void()>;
-
-template <typename Task>
-concept SchedulerTask = std::convertible_to<Task, TaskFunction>;
+template <typename WorkerType>
+concept WorkerConcept = std::derived_from<WorkerType, WorkerBase>;
 
 class Scheduler {
 private:
-    struct PerThreadData {
-        Scheduler* current = nullptr;
-        bool isAlive = false;
-    };
+    friend class WorkerBase;
 
 public:
-    static Scheduler& current() {
-        assert((_current.current != nullptr) && "Calling the method from a thread, that is not a Scheduler.");
-        return *_current.current;
-    }
-
-    Scheduler(uint8_t threads = 1);
+    template <typename Factory>
+    Scheduler(Factory&& factory, uint8_t threads = 1): _worker{ factory(this, threads) } {}
     Scheduler(const Scheduler&) = delete;
     Scheduler(Scheduler&&) = delete;
-    ~Scheduler();
+    ~Scheduler() = default;
 
     template <SchedulerTask Task>
     void schedule(Task&& task) {
@@ -44,21 +32,37 @@ public:
             // we create a new object on the heap
             _tasks.emplace(std::move(task));
         }
-        _pushedTasks.release();
+        _worker->notify();
     }
 
-protected:
-    Scheduler(bool start, uint8_t threads = 1);
-    void start(uint8_t threads = 1);
-    void run();
+    static Scheduler& current() {
+        assert((WorkerBase::_current.current != nullptr) && "This method was called not from a thread, created by a scheduler");
+        return *WorkerBase::_current.current;
+    }
 
 private:
-    std::vector<std::thread> _workers;
+    auto grabTask() {
+        std::lock_guard lock(_queueAccess);
+        if (_tasks.size() > 0) {
+            auto task = _tasks.front();
+            _tasks.pop();
+            return std::optional<TaskFunction>{std::move(task)};
+        }
+        return std::optional<TaskFunction>{};
+    }
+
+    auto grabTasks() {
+        TaskQueue tasks;
+        std::lock_guard lock(_queueAccess);
+        tasks.swap(_tasks);
+        return tasks;
+    }
+
+private:
     // ToDo: use production ready lock free queue
     std::mutex _queueAccess;
-    std::queue<TaskFunction> _tasks;
-    std::counting_semaphore<std::numeric_limits<uint32_t>::max()> _pushedTasks{ 0 };
-    static thread_local PerThreadData _current;
+    TaskQueue _tasks;
+    std::unique_ptr<WorkerBase> _worker;
 };
 
 } // Scheduling
