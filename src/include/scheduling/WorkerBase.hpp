@@ -8,10 +8,16 @@
 #include <cstdint>
 #include <scheduling/Definitionts.hpp>
 #include <optional>
+#include <scheduling/ThreadCommunication.hpp>
 
 namespace Scheduling {
 
 class Scheduler;
+
+template <typename T>
+concept LoopObject = requires (T loopObject) {
+    { loopObject(std::stop_token{}) } -> std::convertible_to<void>;
+};
 
 class WorkerBase {
 protected:
@@ -20,23 +26,21 @@ protected:
 private:
     struct PerThreadData {
         Scheduler* current = nullptr;
-        bool isAlive = false;
     };
 
 public:
     virtual ~WorkerBase();
 
 protected:
-    template <typename Loop>
+    template <LoopObject Loop>
     WorkerBase(Scheduler* scheduler, uint8_t threads, Loop&& loop): _scheduler(scheduler) {
         for (uint8_t thread = 0; thread < threads; ++thread) {
-            auto mainLoop = [this, loop = std::move(loop)] {
+            auto mainLoop = [this, loop = std::move(loop), stopToken = _stopSource.get_token()] {
                 _current = PerThreadData {
-                    .current = _scheduler,
-                    .isAlive = true
+                    .current = _scheduler
                 };
 
-                loop();
+                loop(stopToken);
 
                 _current = PerThreadData {};
             };
@@ -53,6 +57,7 @@ protected:
 protected:
     Scheduler* _scheduler = nullptr;
     std::vector<std::thread> _workers;
+    std::stop_source _stopSource;
     static thread_local PerThreadData _current;
 };
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <concepts>
-#include <queue>
 #include <mutex>
 #include <optional>
 #include <scheduling/Definitionts.hpp>
 #include <scheduling/WorkerBase.hpp>
+#include <cassert>
 
 namespace Scheduling {
 
@@ -59,7 +59,7 @@ private:
     }
 
 private:
-    // ToDo: use production ready lock free queue
+    // ToDo: use a production ready lock free queue
     std::mutex _queueAccess;
     TaskQueue _tasks;
     std::unique_ptr<WorkerBase> _worker;

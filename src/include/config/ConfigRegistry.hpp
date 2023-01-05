@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <cassert>
 #include <concepts>
 #include <cstdint>
 #include <math/Hash.hpp>
