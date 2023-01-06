@@ -1,42 +1,44 @@
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <tuple>
-#include <concepts>
 #include <atomic>
-#include <string_view>
-#include <unordered_map>
+#include <concepts>
+#include <cstdint>
 #include <math/Hash.hpp>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
 
 namespace ConfigLibrary {
 
 template <class T, class... Ts>
-struct is_any : std::disjunction<std::is_same<T, Ts>...> {};
+struct is_any : std::disjunction<std::is_same<T, Ts>...> { };
 
 template <class T>
 concept AtomicType = std::atomic<T>::is_always_lock_free;
 
-template <class T, class ... Ts>
+template <class T, class... Ts>
 concept IsConfigAllowedType = AtomicType<T> && is_any<T, Ts...>::value;
 
-template <AtomicType ... Ts>
+template <AtomicType... Ts>
 class ConfigRegistryBase {
 protected:
     using ConfigVariableId = size_t;
     template <IsConfigAllowedType<Ts...> T>
-    class ConfigVariable {        
+    class ConfigVariable {
     public:
-        ConfigVariable(ConfigRegistryBase& registry_, ConfigVariableId id_): registry{registry_}, id{id_} {}
+        ConfigVariable(ConfigRegistryBase& registry_, ConfigVariableId id_)
+            : registry{registry_}
+            , id{id_} { }
         ConfigVariable(const ConfigVariable&) = delete;
         ConfigVariable(ConfigVariable&&) = delete;
 
-        auto getValue() const -> T { 
+        auto getValue() const -> T {
             const auto& container = std::get<PerTypeConfigContainer<T>>(registry._configVariables);
             return container[id].value.load();
         }
 
-        auto setValue(T value) -> void { 
+        auto setValue(T value) -> void {
             auto& container = std::get<PerTypeConfigContainer<T>>(registry._configVariables);
             container[id].value.store(value);
         }
@@ -48,8 +50,10 @@ protected:
 private:
     template <IsConfigAllowedType<Ts...> T>
     struct ConfigVariableValueContainer {
-        ConfigVariableValueContainer(T value_): value{value_} {}
-        ConfigVariableValueContainer(ConfigVariableValueContainer&& other): value{other.value.load()} {}
+        ConfigVariableValueContainer(T value_)
+            : value{value_} { }
+        ConfigVariableValueContainer(ConfigVariableValueContainer&& other)
+            : value{other.value.load()} { }
 
         std::atomic<T> value;
     };
@@ -60,8 +64,7 @@ private:
 
 public:
     template <IsConfigAllowedType<Ts...> T>
-    [[nodiscard]]
-    auto getConfigVariableValueByName(std::string_view name) const -> T {
+    [[nodiscard]] auto getConfigVariableValueByName(std::string_view name) const -> T {
         const auto& container = std::get<PerTypeConfigContainer<T>>(_configVariables);
         if (auto it = _addressTable.find(name); it != _addressTable.end()) {
             return container[it->second].value.load();
@@ -72,11 +75,10 @@ public:
     }
 
 protected:
-    ConfigRegistryBase() {}
+    ConfigRegistryBase() { }
 
     template <IsConfigAllowedType<Ts...> T>
-    [[nodiscard]]
-    auto registerConfigVariable(std::string_view name, T defaultValue = {}) -> ConfigVariable<T> {
+    [[nodiscard]] auto registerConfigVariable(std::string_view name, T defaultValue = {}) -> ConfigVariable<T> {
         auto& container = std::get<PerTypeConfigContainer<T>>(_configVariables);
         // We check that the name is not presented
         assert(_addressTable.find(name) == _addressTable.end());
