@@ -1,8 +1,8 @@
 #pragma once
 
 #include <concepts>
-#include <queue>
 #include <functional>
+#include <queue>
 
 namespace Scheduling {
 

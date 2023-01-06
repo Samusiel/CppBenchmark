@@ -1,5 +1,4 @@
 ---
-BasedOnStyle: WebKit
 AccessModifierOffset: '-4'
 AlignAfterOpenBracket: DontAlign
 AlignConsecutiveMacros: 'true'
@@ -16,11 +15,18 @@ AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: Empty
 AllowShortLoopsOnASingleLine: 'false'
 AlwaysBreakTemplateDeclarations: 'Yes'
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+BasedOnStyle: WebKit
 BreakBeforeBraces: Attach
+# BreakAfterAttributes: Always
 ColumnLimit: '120'
 Cpp11BracedListStyle: 'true'
+DerivePointerAlignment: 'false'
 Language: Cpp
 IncludeBlocks: Preserve
 NamespaceIndentation: None
+PointerAlignment: Left
 SpaceBeforeCpp11BracedList: 'false'
 TabWidth: '4'
+QualifierAlignment: Left

@@ -16,7 +16,7 @@ template <IsAggregate T, typename... Args>
 consteval auto memberCount() {
     static_assert(std::is_aggregate_v<std::remove_cvref_t<T>>);
 
-    if constexpr (requires {T{{Args{}}..., {UniversalType{}}}; } == false) {
+    if constexpr (requires { T{{Args{}}..., {UniversalType{}}}; } == false) {
         return sizeof...(Args);
     } else {
         return memberCount<T, Args..., UniversalType>();

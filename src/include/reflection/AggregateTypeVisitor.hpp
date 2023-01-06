@@ -36,15 +36,18 @@ auto visit(Visitor&& visitor, const T& value) {
         auto&& [f1, f2, f3, f4, f5, f6, f7, f8] = value;
         return visitor(f1, f2, f3, f4, f5, f6, f7, f8);
     } else {
-        static_assert((count >= MaxMemberCount) && "MaxMemberCount has been increased, add extra code to support additional values.");
+        static_assert((count >= MaxMemberCount)
+            && "MaxMemberCount has been increased, add extra code to support additional values.");
     }
 }
 
 template <IsAggregate T>
 auto makeTuple(const T& value) {
-    return visit([](const auto& ... values) {
-        return std::make_tuple(std::forward<decltype(values)>(values)...);
-    }, value);
+    return visit(
+        [](const auto&... values) {
+            return std::make_tuple(std::forward<decltype(values)>(values)...);
+        },
+        value);
 }
 
 } // namespace Reflection

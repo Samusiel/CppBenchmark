@@ -1,5 +1,5 @@
-#include <scheduling/WorkerBase.hpp>
 #include <scheduling/Scheduler.hpp>
+#include <scheduling/WorkerBase.hpp>
 
 namespace Scheduling {
 
@@ -7,7 +7,7 @@ thread_local WorkerBase::PerThreadData WorkerBase::_current = WorkerBase::PerThr
 
 WorkerBase::~WorkerBase() {
     _stopSource.request_stop();
-    
+
     std::for_each(_workers.begin(), _workers.end(), [](auto& worker) {
         if (worker.joinable()) {
             worker.join();

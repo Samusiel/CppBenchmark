@@ -1,10 +1,12 @@
-#include <scheduling/Worker.hpp>
 #include <scheduling/Scheduler.hpp>
+#include <scheduling/Worker.hpp>
 
 namespace Scheduling {
 
-Worker::Worker(Scheduler* scheduler, uint8_t threads): 
-    WorkerBase(scheduler, threads, [this](std::stop_token stopToken) { run(std::move(stopToken)); }) {}
+Worker::Worker(Scheduler* scheduler, uint8_t threads)
+    : WorkerBase(scheduler, threads, [this](std::stop_token stopToken) {
+        run(std::move(stopToken));
+    }) { }
 
 void Worker::notify() {
     _pushedTasks.release();

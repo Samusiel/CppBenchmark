@@ -17,7 +17,7 @@ private:
     void run(std::stop_token&& stopToken);
 
 private:
-    std::counting_semaphore<std::numeric_limits<uint16_t>::max()> _pushedTasks{ 0 };
+    std::counting_semaphore<std::numeric_limits<uint16_t>::max()> _pushedTasks{0};
 };
 
-} // Scheduling
+} // namespace Scheduling

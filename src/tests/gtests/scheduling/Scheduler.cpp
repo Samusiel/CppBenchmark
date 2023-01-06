@@ -2,6 +2,4 @@
 
 #include <scheduling/Scheduler.hpp>
 
-TEST(Scheduling, Scheduler) {
-    
-}
+TEST(Scheduling, Scheduler) { }
