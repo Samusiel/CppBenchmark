@@ -1,8 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <string_view>
-#include <algorithm>
 
 namespace Math {
 
@@ -21,4 +21,3 @@ consteval size_t compileTimeHash(std::string_view str) {
 }
 
 } // namespace Math
-
