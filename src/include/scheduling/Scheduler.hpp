@@ -37,9 +37,9 @@ public:
     }
 
     static Scheduler& current() {
-        assert((WorkerBase::_current.current != nullptr)
+        assert((WorkerBase::_current.scheduler != nullptr)
             && "This method was called not from a thread, created by a scheduler");
-        return *WorkerBase::_current.current;
+        return *WorkerBase::_current.scheduler;
     }
 
 private:

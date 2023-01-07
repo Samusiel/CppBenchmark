@@ -25,7 +25,8 @@ protected:
 
 private:
     struct PerThreadData {
-        Scheduler* current = nullptr;
+        Scheduler* scheduler = nullptr;
+        std::thread::id currentThreadId;
     };
 
 public:
@@ -37,7 +38,7 @@ protected:
         : _scheduler(scheduler) {
         for (uint8_t thread = 0; thread < threads; ++thread) {
             auto mainLoop = [this, loop = std::move(loop), stopToken = _stopSource.get_token()] {
-                _current = PerThreadData{.current = _scheduler};
+                _current = PerThreadData{.scheduler = _scheduler, .currentThreadId = std::this_thread::get_id()};
 
                 loop(stopToken);
 
@@ -50,8 +51,8 @@ protected:
     virtual void notify() = 0;
 
 protected:
-    auto grabTask() -> std::optional<TaskFunction>;
-    auto grabTasks() -> TaskQueue;
+    [[nodiscard]] auto grabTask() -> std::optional<TaskFunction>;
+    [[nodiscard]] auto grabTasks() -> TaskQueue;
 
 protected:
     Scheduler* _scheduler = nullptr;

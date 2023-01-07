@@ -17,10 +17,14 @@ WorkerBase::~WorkerBase() {
 }
 
 auto WorkerBase::grabTask() -> std::optional<TaskFunction> {
+    assert((_current.currentThreadId == std::this_thread::get_id())
+        && "Grab should perform only from a thread, created as a worker.");
     return _scheduler->grabTask();
 }
 
 auto WorkerBase::grabTasks() -> TaskQueue {
+    assert((_current.currentThreadId == std::this_thread::get_id())
+        && "Grab should perform only from a thread, created as a worker.");
     return _scheduler->grabTasks();
 }
 

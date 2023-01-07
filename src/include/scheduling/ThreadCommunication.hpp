@@ -67,23 +67,17 @@ public:
 
     stop_token& operator=(stop_token&&) noexcept = default;
 
-    [[nodiscard]] //
-    bool
-    stop_possible() const noexcept {
+    [[nodiscard]] bool stop_possible() const noexcept {
         return static_cast<bool>(_M_state) && _M_state->_M_stop_possible();
     }
 
-    [[nodiscard]] //
-    bool
-    stop_requested() const noexcept {
+    [[nodiscard]] bool stop_requested() const noexcept {
         return static_cast<bool>(_M_state) && _M_state->_M_stop_requested();
     }
 
     void swap(stop_token& __rhs) noexcept { _M_state.swap(__rhs._M_state); }
 
-    [[nodiscard]] //
-    friend bool
-    operator==(const stop_token& __a, const stop_token& __b) {
+    [[nodiscard]] friend bool operator==(const stop_token& __a, const stop_token& __b) {
         return __a._M_state == __b._M_state;
     }
 
