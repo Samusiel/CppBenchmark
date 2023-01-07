@@ -5,6 +5,7 @@
 #include <reflection/AggregateTypeVisitor.hpp>
 #include <resources/ResourceManager.hpp>
 #include <scheduling/Scheduler.hpp>
+#include <std_helpers/Visitor.hpp>
 #include <thread>
 
 // template <typename Factory, typename Resource>
@@ -70,36 +71,15 @@
 // //     decltype(resourceLoader)>(std::move(resourceLoader));
 // // }
 
-class Archive {
-    struct Record {
-        std::string title;
-        std::string content;
-    };
-
-public:
-    void add(int id, std::string title, std::string content) {
-        records[id] = Record{.title = std::move(title), .content = std::move(content)};
-    }
-
-    void remove(int id, std::string& title, std::string& content) {
-        if (auto it = records.find(id); it != records.end()) {
-            auto& doc = it->second;
-            title = doc.title;
-            content = doc.content;
-
-            records.erase(it);
-        } else {
-            throw std::invalid_argument("Incorrect id");
-        }
-    }
-
-    void clear() { records.clear(); }
-
-private:
-    std::unordered_map<int, Record> records;
-};
-
 int main() {
 
-    return 0;
+    std::variant<int, double> v{5.0};
+    StdHelpers::match(
+        v,
+        [](const double& value) {
+            std::cout << "Double: " << value << std::endl;
+        },
+        [](const int& value) {
+            std::cout << "Double: " << value << std::endl;
+        });
 }
