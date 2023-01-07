@@ -14,7 +14,7 @@ class Visitor : public Args... {
 public:
     using Args::operator()...;
     Visitor(Args&&... args)
-        : Args{args}... { }
+        : Args{std::forward<Args>(args)}... { }
 };
 
 template <typename Visitee, typename... Args>
