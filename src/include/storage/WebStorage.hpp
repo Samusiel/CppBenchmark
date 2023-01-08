@@ -4,4 +4,4 @@ namespace Storage {
 
 class WebStorage { };
 
-}
+} // namespace Storage

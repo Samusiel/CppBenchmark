@@ -23,4 +23,4 @@ void match(const Visitee& visitee, Args&&... args) {
     std::visit(Visitor{std::forward<Args>(args)...}, visitee);
 }
 
-}
+} // namespace StdHelpers

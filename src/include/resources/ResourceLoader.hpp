@@ -10,6 +10,7 @@ public:
     ResourceLoader();
     ~ResourceLoader();
 
+    template <typename Resource>
     void load(const ResourceId& id);
 
 private:
@@ -17,4 +18,4 @@ private:
     std::unique_ptr<Impl> _impl;
 };
 
-}
+} // namespace Resources

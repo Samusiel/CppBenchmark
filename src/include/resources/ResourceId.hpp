@@ -11,4 +11,4 @@ using FileSystemPath = std::filesystem::path;
 
 using ResourceId = std::variant<WebPath, FileSystemPath>;
 
-};
+} // namspace Resources
