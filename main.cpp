@@ -80,6 +80,10 @@ int main() {
     Profiling::ProfileScopeGuard guard{
         Profiling::ProfileBackendFactory::createCPUBackend(Profiling::ProfileMark::create("Hello World"))};
 
+    // const auto call = [guard = std::move(guard)] {
+
+    // };
+
     // std::cout << "Aand done" << std::endl;
     //  h.destroy();
     return 0;

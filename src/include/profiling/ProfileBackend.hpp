@@ -4,6 +4,7 @@
 #include <concepts>
 #include <profiling/ProfileMark.hpp>
 #include <profiling/Profiler.hpp>
+#include <utility>
 
 namespace Profiling {
 
@@ -35,6 +36,20 @@ public:
                 profiler.emit(Timer{mark, duration});
             });
     }
+
+    static consteval auto createMockBackend() {
+        return ProfileBackend(
+            [] {
+                return std::chrono::system_clock::now();
+            },
+            [] {
+                return std::chrono::system_clock::now();
+            },
+            [] {}, [](Profiler&, const TimeDuration&) {});
+    }
 };
+
+using CPUBackend = decltype(ProfileBackendFactory::createCPUBackend(std::declval<ProfileMark>()));
+using MockBackend = decltype(ProfileBackendFactory::createMockBackend());
 
 } // namespace Profiling
