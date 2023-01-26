@@ -5,7 +5,13 @@
 
 namespace Profiling {
 
-template <typename... Outputs>
+template <typename Output>
+concept OutputConcept = requires {
+                            typename Output::Settings;
+                            typename Output::Settings::Output;
+                        };
+
+template <OutputConcept... Outputs>
 using BaseOutputSettings = std::variant<typename Outputs::Settings...>;
 
 struct ProfileSettings {

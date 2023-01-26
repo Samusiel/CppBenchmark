@@ -12,7 +12,7 @@ void Worker::notify() {
     _pushedTasks.release();
 }
 
-void Worker::run(std::stop_token&& stopToken) {
+void Worker::run(std::stop_token stopToken) {
     constexpr std::chrono::microseconds period{32};
     while (!stopToken.stop_requested()) {
         // Wait until a new task has been submitted
