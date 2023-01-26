@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-file(GLOB_RECURSE SRC_FILES "src/*.cpp")
+file(GLOB_RECURSE SRC_FILES "src/*.[h|c]pp")
 
 message("${SRC_FILES}")
 

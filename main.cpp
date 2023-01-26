@@ -1,3 +1,4 @@
+#include <application/Application.hpp>
 #include <config/ConfigRegistry.hpp>
 #include <experimental/coroutine>
 #include <functional>
@@ -79,6 +80,8 @@ int main() {
     // loadFile("file.txt");
     Profiling::ProfileScopeGuard guard{
         Profiling::ProfileBackendFactory::createCPUBackend(Profiling::ProfileMark::create("Hello World"))};
+
+    Application::Application app{Application::ApplicationSettings{}};
 
     // const auto call = [guard = std::move(guard)] {
 

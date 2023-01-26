@@ -1,5 +1,6 @@
 #pragma once
 
+#include <scheduling/ScheduleSettings.hpp>
 #include <scheduling/Scheduler.hpp>
 #include <scheduling/Worker.hpp>
 
@@ -10,13 +11,13 @@ private:
     constexpr static uint8_t MaxPoolSize = 8;
 
 public:
-    ScheduleManager(uint8_t poolSize)
+    ScheduleManager(const ScheduleSettings& settings)
         : _pool(
             [](Scheduler* scheduler, uint8_t threads) {
                 assert(threads <= MaxPoolSize);
                 return std::make_unique<Worker>(scheduler, threads);
             },
-            poolSize) { }
+            settings.poolSize) { }
 
     auto create(uint8_t threads) {
         return Scheduler{[](Scheduler* scheduler, uint8_t threads) {
