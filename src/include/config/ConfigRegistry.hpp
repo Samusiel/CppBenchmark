@@ -28,7 +28,7 @@ protected:
     template <IsConfigAllowedType<Ts...> T>
     class ConfigVariable {
     public:
-        ConfigVariable(ConfigRegistryBase& registry_, ConfigVariableId id_)
+        ConfigVariable(ConfigRegistryBase& registry_, ConfigVariableId id_) noexcept
             : registry{registry_}
             , id{id_} { }
         ConfigVariable(const ConfigVariable&) = delete;
@@ -76,7 +76,7 @@ public:
     }
 
 protected:
-    ConfigRegistryBase() { }
+    ConfigRegistryBase() noexcept { }
 
     template <IsConfigAllowedType<Ts...> T>
     [[nodiscard]] auto registerConfigVariable(std::string_view name, T defaultValue = {}) -> ConfigVariable<T> {

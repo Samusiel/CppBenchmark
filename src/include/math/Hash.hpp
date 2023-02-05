@@ -6,7 +6,7 @@
 
 namespace Math {
 
-constexpr size_t hash(std::string_view str) {
+constexpr size_t hash(std::string_view str) noexcept {
     // A prime number
     size_t hashValue = 151214226848455241;
     constexpr size_t seed = 1099511628211;

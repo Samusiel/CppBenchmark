@@ -36,7 +36,7 @@ public:
         _worker->notify();
     }
 
-    static Scheduler& current() {
+    static Scheduler& current() noexcept {
         assert((WorkerBase::_current.current != nullptr)
             && "This method was called not from a thread, created by a scheduler");
         return *WorkerBase::_current.current;
