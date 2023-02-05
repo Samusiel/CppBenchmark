@@ -8,12 +8,10 @@
 
 namespace Profiling {
 
-using SystemClockTimePoint = std::chrono::time_point<std::chrono::system_clock>;
-
 template <typename Backend>
 concept ProfileBackendConcept = requires(Backend&& backend) {
-                                    { backend.begin() } -> std::same_as<SystemClockTimePoint>;
-                                    { backend.end() } -> std::same_as<SystemClockTimePoint>;
+                                    { backend.begin() } -> std::same_as<ProfilingTimePoint>;
+                                    { backend.end() } -> std::same_as<ProfilingTimePoint>;
                                     { backend.submit(Profiler::instance(), TimeDuration{}) } -> std::same_as<void>;
                                 };
 
@@ -51,8 +49,8 @@ public:
 private:
     Profiler& _profiler;
     std::variant<Backend, MockBackend> _backend;
-    SystemClockTimePoint _begin;
-    SystemClockTimePoint _end;
+    ProfilingTimePoint _begin;
+    ProfilingTimePoint _end;
 };
 
 } // namespace Profiling
