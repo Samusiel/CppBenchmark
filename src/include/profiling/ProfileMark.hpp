@@ -14,11 +14,14 @@ public:
         return ProfileMark(name, index.value());
     }
 
-    constexpr auto getName() const -> std::string_view { return _name; }
-    constexpr auto getIndex() const -> size_t { return _index; }
+    constexpr auto getName() const noexcept -> std::string_view { return _name; }
+    constexpr auto getIndex() const noexcept -> size_t { return _index; }
+
+    constexpr ProfileMark(const ProfileMark& mark) noexcept = default;
+    constexpr ProfileMark(ProfileMark&& mark) noexcept = default;
 
 private:
-    constexpr ProfileMark(std::string_view name, size_t index)
+    constexpr ProfileMark(std::string_view name, size_t index) noexcept
         : _name(name)
         , _index(index) { }
 

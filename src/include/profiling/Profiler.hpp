@@ -9,7 +9,7 @@ namespace Profiling {
 class Profiler {
 public:
     // ToDo: remove this method and put profiler under the App class
-    static Profiler& instance() {
+    static Profiler& instance() noexcept {
         static Profiler profiler{ProfileSettings{}};
         return profiler;
     }
