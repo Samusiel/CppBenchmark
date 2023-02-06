@@ -1,7 +1,13 @@
+#include <application/Application.hpp>
 #include <config/ConfigRegistry.hpp>
 #include <experimental/coroutine>
+#include <functional>
 #include <iostream>
 #include <math/Hash.hpp>
+#include <profiling/ProfileBackend.hpp>
+#include <profiling/ProfileGuard.hpp>
+#include <profiling/ProfileMark.hpp>
+#include <profiling/ProfileMarks.hpp>
 #include <reflection/AggregateTypeVisitor.hpp>
 #include <resources/ResourceManager.hpp>
 #include <scheduling/Scheduler.hpp>
@@ -72,11 +78,16 @@ Task<File> loadFile(std::string name, Resources::ResourceManager& resourceManage
 
 int main() {
     // loadFile("file.txt");
-    Scheduling::Scheduler s{};
-    s.schedule([] {
-        std::cout << "In the middle" << std::endl;
-    });
-    std::cout << "Aand done" << std::endl;
-    // h.destroy();
+    Profiling::ProfileScopeGuard guard{
+        Profiling::ProfileBackendFactory::createCPUBackend(Profiling::ProfileMark::create("Hello World"))};
+
+    Application::Application app{Application::ApplicationSettings{}};
+
+    // const auto call = [guard = std::move(guard)] {
+
+    // };
+
+    // std::cout << "Aand done" << std::endl;
+    //  h.destroy();
     return 0;
 }
